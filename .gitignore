@@ -1,0 +1,9 @@
+node_modules/
+.env
+.DS_Store
+npm-debug.log*
+*.log
+
+# Large 360 tour panoramas (~3GB) — copy to EC2 separately
+public/tour/media/*
+!public/tour/media/README.md

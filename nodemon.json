@@ -1,0 +1,5 @@
+{
+  "watch": ["server.js", "db.js", "views", "public/assets"],
+  "ext": "js,json,html,css",
+  "ignore": ["node_modules", "public/tour"]
+}
