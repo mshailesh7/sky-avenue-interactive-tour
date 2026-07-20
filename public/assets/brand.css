@@ -1,3 +1,19 @@
+@font-face {
+    font-family: 'ClassyVogue';
+    src: url('/assets/fonts/Classyvogueregular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'FuturaBT';
+    src: url('/assets/fonts/FuturaBT-Light.otf') format('opentype');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
 :root {
     --green-deep: #1a3428;
     --green-mid: #1f3d30;
@@ -16,6 +32,8 @@
     --success-bg: rgba(72, 140, 100, 0.14);
     --success-border: rgba(120, 190, 150, 0.28);
     --success-text: #b8e6cc;
+    --font-display: 'ClassyVogue', Georgia, 'Times New Roman', serif;
+    --font-body: 'FuturaBT', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
 * {
@@ -25,7 +43,7 @@
 }
 
 body {
-    font-family: 'Lato', sans-serif;
+    font-family: var(--font-body);
     color: var(--text-primary);
     min-height: 100vh;
     background: var(--green-deep);
@@ -60,7 +78,7 @@ body::after {
 }
 
 h1, h2, h3, .brand-heading {
-    font-family: 'Cinzel', serif;
+    font-family: var(--font-display);
     letter-spacing: 0.04em;
 }
 
@@ -95,6 +113,7 @@ h1, h2, h3, .brand-heading {
     border-radius: 10px;
     padding: 13px 15px;
     color: var(--text-primary);
+    font-family: var(--font-body);
     font-size: 15px;
     outline: none;
     transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
@@ -113,6 +132,7 @@ h1, h2, h3, .brand-heading {
 .btn {
     padding: 11px 18px;
     border-radius: 10px;
+    font-family: var(--font-body);
     font-size: 14px;
     font-weight: 700;
     cursor: pointer;
@@ -206,11 +226,11 @@ h1, h2, h3, .brand-heading {
 }
 
 .brand-logo {
-    width: min(240px, 72vw);
+    width: min(168px, 52vw);
     height: auto;
     display: block;
-    margin: 0 auto 18px;
-    filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.28));
+    margin: 0 auto 14px;
+    filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.28));
 }
 
 .brand-subtitle {

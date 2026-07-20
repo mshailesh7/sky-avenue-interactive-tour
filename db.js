@@ -22,6 +22,8 @@ const userSchema = new mongoose.Schema({
     phone: { type: String, required: true, unique: true, index: true },
     name: { type: String, default: '' },
     password_hash: { type: String, required: true },
+    // Admin-only recoverable copy for client invite lookup / handoff
+    access_password: { type: String, default: null },
     device_limit: { type: Number, default: 2 },
     expires_at: { type: Date, default: null },
     is_admin: { type: Boolean, default: false },
@@ -185,12 +187,49 @@ async function createUser({ phone, password, name, durationDays, deviceLimit }) 
         phone: normalizedPhone,
         name: clientName,
         password_hash: bcrypt.hashSync(password, 10),
+        access_password: password,
         device_limit: parseInt(deviceLimit, 10) || 2,
         expires_at: expiresAt,
         is_admin: false
     });
 
-    return newUser.toJSON();
+    const userJson = newUser.toJSON();
+    delete userJson.password_hash;
+    return userJson;
+}
+
+async function updateUserPassword(userId, password) {
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+        throw new Error('Invalid user id');
+    }
+
+    if (typeof password !== 'string' || !password.trim()) {
+        throw new Error('Password is required');
+    }
+
+    if (password.length > 128) {
+        throw new Error('Password is too long');
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+        throw new Error('User not found');
+    }
+
+    if (user.is_admin) {
+        throw new Error('Admin password cannot be changed from this panel');
+    }
+
+    user.password_hash = bcrypt.hashSync(password, 10);
+    user.access_password = password;
+    await user.save();
+
+    // Force re-login on all devices after a password change
+    await Session.deleteMany({ user_id: String(user._id) });
+
+    const userJson = user.toJSON();
+    delete userJson.password_hash;
+    return userJson;
 }
 
 async function deleteUser(userId) {
@@ -269,6 +308,7 @@ module.exports = {
     getUserById,
     getUserByPhone,
     createUser,
+    updateUserPassword,
     deleteUser,
     getActiveSessions,
     getUserSessions,

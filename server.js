@@ -85,6 +85,9 @@ app.use(async (req, res, next) => {
 
 function requireAuth(req, res, next) {
     if (!req.user) {
+        if (isApiRequest(req)) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
         return res.redirect('/login');
     }
     next();
@@ -114,23 +117,30 @@ async function destroySession(req, res) {
 // Public brand assets (logo, styles)
 const assetsDir = path.join(__dirname, 'public', 'assets');
 app.use('/assets', express.static(assetsDir));
+app.get('/favicon.ico', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'favicon.ico'));
+});
 app.get('/sky-avenue-logo.png', (req, res) => {
     res.sendFile(path.join(assetsDir, 'sky-avenue-logo.png'));
 });
 
-// Redirect root to the tour or login depending on auth state
+function postLoginRedirect(user) {
+    if (user.is_admin) return '/admin';
+    return '/welcome';
+}
+
+// Redirect root to welcome (clients) / admin / login
 app.get('/', (req, res) => {
-    if (req.user) {
-        res.redirect('/tour/');
-    } else {
-        res.redirect('/login');
+    if (!req.user) {
+        return res.redirect('/login');
     }
+    res.redirect(postLoginRedirect(req.user));
 });
 
 // Serve Login Page
 app.get('/login', (req, res) => {
     if (req.user) {
-        return res.redirect(req.user.is_admin ? '/admin' : '/tour/');
+        return res.redirect(postLoginRedirect(req.user));
     }
     res.sendFile(path.join(__dirname, 'views', 'login.html'));
 });
@@ -189,7 +199,7 @@ app.post('/login', async (req, res) => {
 
         res.cookie('session_id', session.session_id, getCookieOptions(SESSION_COOKIE_MAX_AGE));
 
-        res.json({ success: true, redirect: user.is_admin ? '/admin' : '/tour/' });
+        res.json({ success: true, redirect: postLoginRedirect(user) });
     } catch (err) {
         console.error('Login error:', err);
         res.status(500).json({ error: 'An internal server error occurred.' });
@@ -204,6 +214,25 @@ app.post('/logout', async (req, res) => {
 app.get('/logout', async (req, res) => {
     await destroySession(req, res);
     res.redirect('/login');
+});
+
+// Welcome gate (clients) — continue to tour or logout without editing tour files
+app.get('/welcome', requireAuth, (req, res) => {
+    if (req.user.is_admin) {
+        return res.redirect('/admin');
+    }
+    res.sendFile(path.join(__dirname, 'views', 'welcome.html'));
+});
+
+app.get('/api/me', requireAuth, (req, res) => {
+    res.json({
+        id: req.user.id || req.user._id,
+        name: req.user.name || (req.user.is_admin ? 'Admin' : 'Guest'),
+        phone: req.user.phone,
+        is_admin: Boolean(req.user.is_admin),
+        device_limit: req.user.device_limit,
+        expires_at: req.user.expires_at || null
+    });
 });
 
 // Serve Admin Panel
@@ -281,6 +310,26 @@ app.delete('/api/admin/users/:id', requireAdmin, async (req, res) => {
         res.json({ success: true });
     } catch (err) {
         res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/admin/users/:id/password', requireAdmin, async (req, res) => {
+    const password = typeof req.body.password === 'string' ? req.body.password : '';
+
+    if (!password.trim()) {
+        return res.status(400).json({ error: 'Password is required.' });
+    }
+
+    if (password.length > 128) {
+        return res.status(400).json({ error: 'Password is too long.' });
+    }
+
+    try {
+        const user = await db.updateUserPassword(req.params.id, password);
+        res.json({ success: true, user });
+    } catch (err) {
+        const status = err.message === 'User not found' ? 404 : 400;
+        res.status(status).json({ error: err.message });
     }
 });
 
