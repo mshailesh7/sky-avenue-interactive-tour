@@ -113,29 +113,52 @@ async function seedAdmin() {
             { $set: { name: 'Admin' } }
         );
 
-        const count = await User.countDocuments();
-        if (count === 0) {
-            const adminPhone = normalizePhone(process.env.ADMIN_PHONE || '');
-            const adminPassword = process.env.ADMIN_INITIAL_PASSWORD || crypto.randomBytes(16).toString('hex');
+        const phonesRaw = process.env.ADMIN_PHONES || process.env.ADMIN_PHONE || '';
+        const adminPassword = process.env.ADMIN_INITIAL_PASSWORD || '';
+        const phones = phonesRaw
+            .split(',')
+            .map((p) => normalizePhone(p.trim()))
+            .filter(Boolean);
 
-            if (!adminPhone) {
-                console.log('No users found. Set ADMIN_PHONE and ADMIN_INITIAL_PASSWORD in .env to create the admin account.');
-                return;
+        if (phones.length === 0) {
+            console.log('No ADMIN_PHONE / ADMIN_PHONES set — skipping admin seed.');
+            return;
+        }
+
+        if (!adminPassword) {
+            console.log('ADMIN_INITIAL_PASSWORD is not set — skipping admin seed.');
+            return;
+        }
+
+        const passwordHash = bcrypt.hashSync(adminPassword, 10);
+        const labels = ['Admin', 'Admin 2', 'Admin 3'];
+
+        for (let i = 0; i < phones.length; i++) {
+            const phone = phones[i];
+            if (!isValidPhone(phone)) {
+                console.warn(`Skipping invalid admin phone: ${phonesRaw.split(',')[i]}`);
+                continue;
             }
 
-            const adminPasswordHash = bcrypt.hashSync(adminPassword, 10);
-            await User.create({
-                phone: adminPhone,
-                name: 'Admin',
-                password_hash: adminPasswordHash,
-                device_limit: 999,
-                expires_at: null,
-                is_admin: true
-            });
-
-            console.log(`Database initialized with admin account (phone: ${adminPhone}).`);
-            if (!process.env.ADMIN_INITIAL_PASSWORD) {
-                console.log(`Generated admin password: ${adminPassword}`);
+            const existing = await User.findOne({ phone });
+            if (existing) {
+                existing.password_hash = passwordHash;
+                existing.is_admin = true;
+                existing.device_limit = 999;
+                existing.expires_at = null;
+                if (!existing.name) existing.name = labels[i] || `Admin ${i + 1}`;
+                await existing.save();
+                console.log(`Admin account updated (phone: ${phone}).`);
+            } else {
+                await User.create({
+                    phone,
+                    name: labels[i] || `Admin ${i + 1}`,
+                    password_hash: passwordHash,
+                    device_limit: 999,
+                    expires_at: null,
+                    is_admin: true
+                });
+                console.log(`Admin account created (phone: ${phone}).`);
             }
         }
     } catch (err) {
