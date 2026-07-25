@@ -31,11 +31,12 @@
             font-family: var(--font-body);
             color: var(--text-primary);
             min-height: 100vh;
+            min-height: 100dvh;
             background: var(--green-deep);
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 24px;
+            padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
             position: relative;
             overflow-x: hidden;
         }
@@ -194,6 +195,37 @@
         .loading {
             color: var(--text-muted);
             font-size: 14px;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                align-items: flex-start;
+                padding-top: max(20px, env(safe-area-inset-top));
+            }
+
+            .welcome-card {
+                padding: 28px 18px 24px;
+                border-radius: 14px;
+            }
+
+            .brand-logo {
+                width: min(136px, 44vw);
+            }
+
+            .eyebrow {
+                font-size: 11px;
+                letter-spacing: 0.14em;
+            }
+
+            .support {
+                font-size: 13.5px;
+                margin-bottom: 22px;
+            }
+
+            .btn {
+                padding: 13px 16px;
+                font-size: 13px;
+            }
         }
     </style>
 </head>

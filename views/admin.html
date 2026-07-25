@@ -34,8 +34,9 @@
             font-family: var(--font-body);
             color: var(--text-primary);
             min-height: 100vh;
+            min-height: 100dvh;
             background: var(--green-deep);
-            padding: 36px 20px 48px;
+            padding: max(20px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(32px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
             position: relative;
             overflow-x: hidden;
         }
@@ -82,14 +83,16 @@
         .navbar-brand {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 12px;
+            min-width: 0;
+            flex: 1;
         }
 
         .navbar-logo {
             display: block;
             width: auto;
-            height: 56px;
-            max-width: min(200px, 38vw);
+            height: 48px;
+            max-width: min(160px, 34vw);
             object-fit: contain;
             object-position: center;
             flex-shrink: 0;
@@ -109,21 +112,21 @@
             justify-content: center;
             gap: 4px;
             line-height: 1.15;
-            /* Optical center — logo mark weight sits slightly below geometric mid */
             padding-top: 4px;
+            min-width: 0;
         }
 
         .navbar h1 {
-            font-size: 22px;
+            font-size: clamp(16px, 4.2vw, 22px);
             color: var(--gold-light);
             margin: 0;
             line-height: 1.15;
         }
 
         .navbar span {
-            font-size: 12px;
+            font-size: clamp(10px, 2.8vw, 12px);
             color: var(--text-muted);
-            letter-spacing: 0.12em;
+            letter-spacing: 0.08em;
             text-transform: uppercase;
             line-height: 1.2;
         }
@@ -137,7 +140,22 @@
         @media (max-width: 960px) {
             .navbar {
                 flex-direction: column;
-                align-items: flex-start;
+                align-items: stretch;
+                gap: 16px;
+                padding-bottom: 20px;
+                margin-bottom: 24px;
+            }
+
+            .navbar-actions {
+                width: 100%;
+            }
+
+            .navbar-actions .btn {
+                flex: 1;
+                min-width: 0;
+                text-align: center;
+                font-size: 12px;
+                padding: 10px 12px;
             }
         }
 
@@ -156,13 +174,21 @@
             border: 1px solid transparent;
             color: var(--text-muted);
             font-family: var(--font-display);
-            font-size: 13px;
-            letter-spacing: 0.08em;
+            font-size: 12px;
+            letter-spacing: 0.06em;
             text-transform: uppercase;
-            padding: 10px 16px;
+            padding: 9px 12px;
             border-radius: 999px;
             cursor: pointer;
             transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+        }
+
+        @media (min-width: 640px) {
+            .tab-btn {
+                font-size: 13px;
+                letter-spacing: 0.08em;
+                padding: 10px 16px;
+            }
         }
 
         .tab-btn:hover {
@@ -222,15 +248,17 @@
         }
 
         .toolbar .form-input {
-            min-width: 220px;
-            flex: 1;
+            min-width: 0;
+            width: 100%;
+            flex: 1 1 100%;
+            font-size: 16px;
         }
 
         .toolbar select.form-input {
-            width: auto;
-            min-width: 168px;
-            max-width: 220px;
-            flex: 0 0 auto;
+            width: 100%;
+            min-width: 0;
+            max-width: none;
+            flex: 1 1 100%;
             cursor: pointer;
             padding: 13px 40px 13px 16px;
             appearance: none;
@@ -242,6 +270,22 @@
             background-size: 12px 8px;
         }
 
+        @media (min-width: 640px) {
+            .toolbar .form-input {
+                min-width: 220px;
+                width: auto;
+                flex: 1;
+                font-size: 14px;
+            }
+
+            .toolbar select.form-input {
+                width: auto;
+                min-width: 168px;
+                max-width: 220px;
+                flex: 0 0 auto;
+            }
+        }
+
         .toolbar select.form-input:focus {
             background-color: rgba(0, 0, 0, 0.24);
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%23c9a66b' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
@@ -251,10 +295,18 @@
         }
 
         .toolbar-meta {
-            margin-left: auto;
+            margin-left: 0;
+            width: 100%;
             color: var(--text-muted);
             font-size: 13px;
             white-space: nowrap;
+        }
+
+        @media (min-width: 640px) {
+            .toolbar-meta {
+                margin-left: auto;
+                width: auto;
+            }
         }
 
         .pagination {
@@ -302,10 +354,16 @@
             border: 1px solid var(--green-border);
             border-radius: 18px;
             box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
-            padding: 28px;
+            padding: 20px 16px;
             margin-bottom: 28px;
             position: relative;
             overflow: hidden;
+        }
+
+        @media (min-width: 640px) {
+            .panel-card {
+                padding: 28px;
+            }
         }
 
         .panel-card::before {
@@ -333,10 +391,12 @@
         .table-responsive {
             width: 100%;
             overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         table {
             width: 100%;
+            min-width: 720px;
             border-collapse: collapse;
             text-align: left;
             font-size: 14px;
@@ -389,11 +449,18 @@
             background: rgba(0, 0, 0, 0.18);
             border: 1px solid rgba(201, 166, 107, 0.18);
             border-radius: 10px;
-            padding: 10px 12px;
+            padding: 12px 14px;
             color: var(--text-primary);
-            font-size: 14px;
+            font-size: 16px;
             outline: none;
             transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+        }
+
+        @media (min-width: 640px) {
+            .form-input {
+                font-size: 14px;
+                padding: 10px 12px;
+            }
         }
 
         .form-input:focus {
@@ -509,7 +576,7 @@
             background: rgba(8, 16, 12, 0.72);
             align-items: center;
             justify-content: center;
-            padding: 24px;
+            padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom));
         }
 
         .modal-backdrop.open {
@@ -518,15 +585,23 @@
 
         .modal-card {
             width: min(420px, 100%);
+            max-height: min(90dvh, 90vh);
+            overflow-y: auto;
             background: rgba(22, 46, 36, 0.96);
             border: 1px solid rgba(201, 166, 107, 0.24);
             border-radius: 16px;
-            padding: 28px 26px;
+            padding: 22px 18px;
             box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
         }
 
+        @media (min-width: 480px) {
+            .modal-card {
+                padding: 28px 26px;
+            }
+        }
+
         .modal-card h3 {
-            font-size: 22px;
+            font-size: clamp(18px, 5vw, 22px);
             color: var(--gold-light);
             margin-bottom: 6px;
         }
@@ -541,9 +616,58 @@
         .modal-actions {
             display: flex;
             gap: 10px;
-            justify-content: flex-end;
+            justify-content: stretch;
             margin-top: 22px;
             flex-wrap: wrap;
+        }
+
+        .modal-actions .btn {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        @media (min-width: 480px) {
+            .modal-actions {
+                justify-content: flex-end;
+            }
+
+            .modal-actions .btn {
+                flex: 0 0 auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .create-form-grid {
+                gap: 14px;
+            }
+
+            .pagination {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .pagination-controls {
+                width: 100%;
+            }
+
+            .pagination-controls .btn {
+                flex: 1;
+            }
+
+            .action-stack {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .action-stack .btn {
+                width: 100%;
+                text-align: center;
+            }
+
+            .password-cell {
+                flex-wrap: wrap;
+                min-width: 0;
+            }
         }
 
         .status-badge {
