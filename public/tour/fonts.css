@@ -1,18 +1,41 @@
+/* Brand fonts — ClassyVogue (display) + FuturaBT (body) */
+@font-face {
+   font-family: 'ClassyVogue';
+   src: url('/assets/fonts/Classyvogueregular.ttf') format('truetype'), url('fonts/Classyvogueregular.ttf') format('truetype');
+   font-weight: 400;
+   font-style: normal;
+   font-display: swap;
+}
+
+@font-face {
+   font-family: 'FuturaBT';
+   src: url('/assets/fonts/FuturaBT-Light.otf') format('opentype'), url('fonts/FuturaBT-Light.otf') format('opentype');
+   font-weight: 300;
+   font-style: normal;
+   font-display: swap;
+}
+
+/* Alias legacy tour font names → brand fonts (used by script_general / script_mobile) */
 @font-face {
    font-family: "DINCE-Light";
-   src: url("fonts/DINCE-Light.woff") format("woff"), url("fonts/DINCE-Light.eot") format("embedded-opentype"), url("fonts/DINCE-Light.TTF") format("truetype"), url("fonts/DINCE-Light.svg") format("svg");
+   src: url('/assets/fonts/FuturaBT-Light.otf') format('opentype'), url('fonts/FuturaBT-Light.otf') format('opentype');
    font-weight: normal;
    font-style: normal;
+   font-display: swap;
 }
+
 @font-face {
    font-family: "Dubai Medium";
-   src: url("fonts/Dubai Medium.woff") format("woff"), url("fonts/Dubai Medium.eot") format("embedded-opentype"), url("fonts/Dubai Medium.TTF") format("truetype"), url("fonts/Dubai Medium.svg") format("svg");
+   src: url('/assets/fonts/Classyvogueregular.ttf') format('truetype'), url('fonts/Classyvogueregular.ttf') format('truetype');
    font-weight: normal;
    font-style: normal;
+   font-display: swap;
 }
+
 @font-face {
    font-family: "DINOT-Bold";
-   src: url("fonts/DINOT-Bold.woff2") format("woff2");
+   src: url('/assets/fonts/Classyvogueregular.ttf') format('truetype'), url('fonts/Classyvogueregular.ttf') format('truetype');
    font-weight: bold;
    font-style: normal;
+   font-display: swap;
 }
