@@ -1,6 +1,9 @@
-# Sky Avenue — 360° Virtual Tour
+# Sky Avenue — Interactive Tour
 
 Secure login + admin panel for the Sky Avenue interactive 360° tour.
+
+**Repo:** `sky-avenue-interactive-tour`  
+**Server path:** `/var/www/sky-avenue-interactive-tour`
 
 ## What’s in this repo
 
@@ -45,7 +48,7 @@ Open http://localhost:8080
 ```bash
 rsync -avz --progress \
   /path/to/local/360-website/public/tour/media/ \
-  ubuntu@YOUR_EC2_IP:/var/www/sky-avenue-360/public/tour/media/
+  ubuntu@YOUR_EC2_IP:/var/www/sky-avenue-interactive-tour/public/tour/media/
 ```
 
 ### Env on server
