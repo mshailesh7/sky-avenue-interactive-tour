@@ -125,7 +125,7 @@ app.get('/sky-avenue-logo.png', (req, res) => {
 });
 
 function postLoginRedirect(user) {
-    if (user.is_admin) return '/admin';
+    if (user.is_admin) return '/admin-welcome';
     return '/welcome';
 }
 
@@ -219,9 +219,14 @@ app.get('/logout', async (req, res) => {
 // Welcome gate (clients) — continue to tour or logout without editing tour files
 app.get('/welcome', requireAuth, (req, res) => {
     if (req.user.is_admin) {
-        return res.redirect('/admin');
+        return res.redirect('/admin-welcome');
     }
     res.sendFile(path.join(__dirname, 'views', 'welcome.html'));
+});
+
+// Admin welcome gate — view tour, open panel, or logout
+app.get('/admin-welcome', requireAdmin, (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'admin-welcome.html'));
 });
 
 app.get('/api/me', requireAuth, (req, res) => {
