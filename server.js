@@ -116,6 +116,40 @@ async function destroySession(req, res) {
 
 // Public brand assets (logo, styles)
 const assetsDir = path.join(__dirname, 'public', 'assets');
+const brochurePath = path.join(assetsDir, 'sky-avenue-brochure.pdf');
+const brochureCorsOrigins = new Set([
+    'https://www.szrealty.in',
+    'https://szrealty.in',
+    'http://localhost:5173',
+    'http://127.0.0.1:5173'
+]);
+
+function setBrochureCors(req, res) {
+    const origin = req.headers.origin;
+    if (origin && brochureCorsOrigins.has(origin)) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+        res.setHeader('Vary', 'Origin');
+        res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    }
+}
+
+app.options('/assets/sky-avenue-brochure.pdf', (req, res) => {
+    setBrochureCors(req, res);
+    res.sendStatus(204);
+});
+
+// Force download (not inline PDF view) for the project brochure
+app.get('/assets/sky-avenue-brochure.pdf', (req, res) => {
+    setBrochureCors(req, res);
+    res.download(brochurePath, 'Sky_Avenue_Brochure.pdf', (err) => {
+        if (err && !res.headersSent) {
+            console.error('Brochure download error:', err.message);
+            res.status(err.statusCode === 404 ? 404 : 500).end();
+        }
+    });
+});
+
 app.use('/assets', express.static(assetsDir));
 app.get('/favicon.ico', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'favicon.ico'));
