@@ -399,7 +399,14 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
     const status = err.status || err.statusCode;
     if (status === 416 || err.name === 'RangeNotSatisfiableError') {
+        // One-line breadcrumb so we can find the exact asset on EC2
+        console.warn(
+            `[416 Range] ${req.method} ${req.originalUrl}` +
+            ` range=${req.headers.range || '(none)'}` +
+            ` ua=${(req.headers['user-agent'] || '').slice(0, 80)}`
+        );
         if (!res.headersSent) {
+            res.setHeader('Content-Range', 'bytes */*');
             res.status(416).end();
         }
         return;
