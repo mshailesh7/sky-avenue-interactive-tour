@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const path = require('path');
@@ -391,6 +391,23 @@ app.use('/tour', requireAuth, express.static(path.join(__dirname, 'public', 'tou
 
 app.use((req, res) => {
     res.status(404).send('Page not found');
+});
+
+// Tour media (video / tiles / large assets) uses HTTP Range requests.
+// Stale ranges (file replaced/smaller, empty file, bad Range header) yield 416 —
+// handle them so they don't flood PM2 error logs or crash the process.
+app.use((err, req, res, next) => {
+    const status = err.status || err.statusCode;
+    if (status === 416 || err.name === 'RangeNotSatisfiableError') {
+        if (!res.headersSent) {
+            res.status(416).end();
+        }
+        return;
+    }
+    console.error(err);
+    if (!res.headersSent) {
+        res.status(status && status >= 400 ? status : 500).send('Server error');
+    }
 });
 
 app.listen(PORT, () => {
